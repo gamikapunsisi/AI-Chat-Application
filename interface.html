@@ -3,93 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Call Center Chatbot</title>
-    <style>
-        /* Basic styling for the chatbot interface */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-        }
-        .chat-container {
-            border: 1px solid #ccc;
-            padding: 10px;
-            background-color: #fff;
-            border-radius: 5px;
-            height: 400px;
-            overflow-y: scroll;
-        }
-        .chat-message {
-            margin-bottom: 10px;
-        }
-        .chat-message.agent {
-            text-align: right;
-        }
-        .chat-message.bot {
-            text-align: left;
-        }
-        .input-container {
-            margin-top: 20px;
-        }
-        .input-container input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .input-container button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
+    <title>ChatGPT</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Call Center Chatbot</h1>
-        <div class="chat-container" id="chat-container">
-            <!-- Chat messages will be displayed here -->
-        </div>
-        <div class="input-container">
-            <input type="text" id="user-input" placeholder="Type your message...">
-            <button onclick="sendMessage()">Send</button>
-        </div>
+    <h1>Chatbot</h1>
+    <div id="chat-container">
+        <div id="chat-history"></div>
+        <input type="text" id="user-input">
+        <button onclick="sendMessage()">Send</button>
     </div>
 
     <script>
-        // Function to send user message and receive bot response
         function sendMessage() {
-            var userInput = document.getElementById("user-input").value;
-            displayMessage(userInput, "agent");
-            // Make API call to send userInput to chatbot and receive response
-            // Replace the following line with your actual API call
-            var botResponse = "This is a sample bot response.";
-            displayMessage(botResponse, "bot");
+            var userInput = document.getElementById('user-input').value;
+            var chatHistory = document.getElementById('chat-history');
+    
+            // Append user input to chat history
+            var userMessage = document.createElement('div');
+            userMessage.textContent = 'You: ' + userInput;
+            chatHistory.appendChild(userMessage);
+    
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_input: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Append bot response to chat history
+                var botMessage = document.createElement('div');
+                botMessage.textContent = 'Bot: ' + data.bot_response;
+                chatHistory.appendChild(botMessage);
+            })
+            .catch(error => console.error('Error:', error));
+    
             // Clear user input field
-            document.getElementById("user-input").value = "";
-        }
-
-        // Function to display messages in the chat container
-        function displayMessage(message, sender) {
-            var chatContainer = document.getElementById("chat-container");
-            var messageElement = document.createElement("div");
-            messageElement.classList.add("chat-message", sender);
-            messageElement.innerHTML = message;
-            chatContainer.appendChild(messageElement);
-            // Scroll to bottom of chat container
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            document.getElementById('user-input').value = '';
         }
     </script>
+    
 </body>
 </html>
